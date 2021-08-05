@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
     ss.source_files = 'src/fmdb/FM*.{h,m}'
     ss.exclude_files = 'src/fmdb.m'
     ss.header_dir = 'fmdb'
-    ss.xcconfig = { 'OTHER_CFLAGS' => '$(inherited) -DFMDB_SQLITE_STANDALONE', 'LIBRARY_SEARCH_PATHS' => "$(SRCROOT)/octodb/lib/", 'HEADER_SEARCH_PATHS' => "$(SRCROOT)/octodb/include/" }
+    ss.xcconfig = { 'OTHER_CFLAGS' => '$(inherited)', 'LIBRARY_SEARCH_PATHS' => "$(SRCROOT)/octodb/lib/", 'HEADER_SEARCH_PATHS' => "$(SRCROOT)/octodb/include/" }
   end
 
 end
