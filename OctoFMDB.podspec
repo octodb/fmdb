@@ -20,6 +20,7 @@ Pod::Spec.new do |s|
     ss.exclude_files = 'src/fmdb.m'
     ss.header_dir = 'fmdb'
     ss.resource_bundles = { 'FMDB_Privacy' => 'privacy/PrivacyInfo.xcprivacy' }
+    ss.libraries = 'octodb', 'binn', 'uv', 'secp256k1-vrf'
     ss.xcconfig = { 'OTHER_CFLAGS' => '$(inherited)', 'LIBRARY_SEARCH_PATHS' => "$(SRCROOT)/octodb/lib/", 'HEADER_SEARCH_PATHS' => "$(SRCROOT)/octodb/include/" }
   end
 end
