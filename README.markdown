@@ -77,99 +77,25 @@ Use OctoFMDB in target dependencies
 .product(name: "OctoFMDB", package: "OctoFMDB")
 ```
 
+## Native Libraries
+
+To install the free version of OctoDB native libraries, execute the following in your project root folder:
+
+```
+mkdir octodb && cd octodb
+wget http://octodb.io/download/octodb-free-ios-native-libs.tar.gz
+tar zxvf octodb-free-ios-native-libs.tar.gz
+cd ..
+```
+
+When moving to the full version of OctoDB just copy the libraries to the respective folders as done above, replacing the existing files.
+
+
 ## OctoFMDB Class Reference:
 https://ccgus.github.io/fmdb/html/index.html
 
 ## Automatic Reference Counting (ARC) or Manual Memory Management?
 You can use either style in your Cocoa project.  FMDB will figure out which you are using at compile time and do the right thing.
-
-## What's New in FMDB 2.7
-
-FMDB 2.7 attempts to support a more natural interface. This represents a fairly significant change for Swift developers (audited for nullability; shifted to properties in external interfaces where possible rather than methods; etc.). For Objective-C developers, this should be a fairly seamless transition (unless you were using the ivars that were previously exposed in the public interface, which you shouldn't have been doing, anyway!). 
-
-### Nullability and Swift Optionals
-
-FMDB 2.7 is largely the same as prior versions, but has been audited for nullability. For Objective-C users, this simply means that if you perform a static analysis of your FMDB-based project, you may receive more meaningful warnings as you review your project, but there are likely to be few, if any, changes necessary in your code.
-
-For Swift users, this nullability audit results in changes that are not entirely backward compatible with FMDB 2.6, but is a little more Swifty. Before FMDB was audited for nullability, Swift was forced to defensively assume that variables were optional, but the library now more accurately knows which properties and method parameters are optional, and which are not.
-
-This means, though, that Swift code written for FMDB 2.7 may require changes. For example, consider the following Swift 3/Swift 4 code for FMDB 2.6:
-
-```swift
-queue.inTransaction { db, rollback in
-    do {
-        guard let db == db else {
-            // handle error here
-            return
-        }
-
-        try db.executeUpdate("INSERT INTO foo (bar) VALUES (?)", values: [1])
-        try db.executeUpdate("INSERT INTO foo (bar) VALUES (?)", values: [2])
-    } catch {
-        rollback?.pointee = true
-    }
-}
-```
-
-Because FMDB 2.6 was not audited for nullability, Swift inferred that `db` and `rollback` were optionals. But, now, in FMDB 2.7, Swift now knows that, for example, neither `db` nor `rollback` above can be `nil`, so they are no longer optionals. Thus it becomes:
-
-```swift
-queue.inTransaction { db, rollback in
-    do {
-        try db.executeUpdate("INSERT INTO foo (bar) VALUES (?)", values: [1])
-        try db.executeUpdate("INSERT INTO foo (bar) VALUES (?)", values: [2])
-    } catch {
-        rollback.pointee = true
-    }
-}
-```
-
-### Custom Functions
-
-In the past, when writing custom functions, you would have to generally include your own `@autoreleasepool` block to avoid problems when writing functions that scanned through a large table. Now, FMDB will automatically wrap it in an autorelease pool, so you don't have to.
-
-Also, in the past, when retrieving the values passed to the function, you had to drop down to the SQLite C API and include your own `sqlite3_value_XXX` calls. There are now `FMDatabase` methods, `valueInt`, `valueString`, etc., so you can stay within Swift and/or Objective-C, without needing to call the C functions yourself. Likewise, when specifying the return values, you no longer need to call `sqlite3_result_XXX` C API, but rather you can use `FMDatabase` methods, `resultInt`, `resultString`, etc. There is a new `enum` for `valueType` called `SqliteValueType`, which can be used for checking the type of parameter passed to the custom function.
-
-Thus, you can do something like (as of Swift 3):
-
-```swift
-db.makeFunctionNamed("RemoveDiacritics", arguments: 1) { context, argc, argv in
-    guard db.valueType(argv[0]) == .text || db.valueType(argv[0]) == .null else {
-        db.resultError("Expected string parameter", context: context)
-        return
-    }
-
-    if let string = db.valueString(argv[0])?.folding(options: .diacriticInsensitive, locale: nil) {
-        db.resultString(string, context: context)
-    } else {
-        db.resultNull(context: context)
-    }
-}
-```
-
-And you can then use that function in your SQL (in this case, matching both "Jose" and "José"):
-
-```sql
-SELECT * FROM employees WHERE RemoveDiacritics(first_name) LIKE 'jose'
-```
-
-Note, the method `makeFunctionNamed:maximumArguments:withBlock:` has been renamed to `makeFunctionNamed:arguments:block:`, to more accurately reflect the functional intent of the second parameter.
-
-### API Changes
-
-In addition to the `makeFunctionNamed` noted above, there are a few other API changes. Specifically, 
-
- - To become consistent with the rest of the API, the methods `objectForColumnName` and `UTF8StringForColumnName` have been renamed to `objectForColumn` and `UTF8StringForColumn`.
-
- - Note, the `objectForColumn` (and the associted subscript operator) now returns `nil` if an invalid column name/index is passed to it. It used to return `NSNull`.
-
- - To avoid confusion with `FMDatabaseQueue` method `inTransaction`, which performs transactions, the `FMDatabase` method to determine whether you are in a transaction or not, `inTransaction`, has been replaced with a read-only property, `isInTransaction`. 
-
- - Several functions have been converted to properties, namely, `databasePath`, `maxBusyRetryTimeInterval`, `shouldCacheStatements`, `sqliteHandle`, `hasOpenResultSets`, `lastInsertRowId`, `changes`, `goodConnection`, `columnCount`, `resultDictionary`, `applicationID`, `applicationIDString`, `userVersion`, `countOfCheckedInDatabases`, `countOfCheckedOutDatabases`, and `countOfOpenDatabases`. For Objective-C users, this has little material impact, but for Swift users, it results in a slightly more natural interface. Note: For Objective-C developers, previously versions of FMDB exposed many ivars (but we hope you weren't using them directly, anyway!), but the implmentation details for these are no longer exposed.
-
-### URL Methods
-
-In keeping with Apple's shift from paths to URLs, there are now `NSURL` renditions of the various `init` methods, previously only accepting paths. 
 
 ## Usage
 There are three main classes in FMDB:
@@ -431,6 +357,95 @@ queue.inTransaction { db, rollback in
 ## Making custom sqlite functions, based on blocks.
 
 You can do this!  For an example, look for `-makeFunctionNamed:` in main.m
+
+## What's New in FMDB 2.7
+
+FMDB 2.7 attempts to support a more natural interface. This represents a fairly significant change for Swift developers (audited for nullability; shifted to properties in external interfaces where possible rather than methods; etc.). For Objective-C developers, this should be a fairly seamless transition (unless you were using the ivars that were previously exposed in the public interface, which you shouldn't have been doing, anyway!). 
+
+### Nullability and Swift Optionals
+
+FMDB 2.7 is largely the same as prior versions, but has been audited for nullability. For Objective-C users, this simply means that if you perform a static analysis of your FMDB-based project, you may receive more meaningful warnings as you review your project, but there are likely to be few, if any, changes necessary in your code.
+
+For Swift users, this nullability audit results in changes that are not entirely backward compatible with FMDB 2.6, but is a little more Swifty. Before FMDB was audited for nullability, Swift was forced to defensively assume that variables were optional, but the library now more accurately knows which properties and method parameters are optional, and which are not.
+
+This means, though, that Swift code written for FMDB 2.7 may require changes. For example, consider the following Swift 3/Swift 4 code for FMDB 2.6:
+
+```swift
+queue.inTransaction { db, rollback in
+    do {
+        guard let db == db else {
+            // handle error here
+            return
+        }
+
+        try db.executeUpdate("INSERT INTO foo (bar) VALUES (?)", values: [1])
+        try db.executeUpdate("INSERT INTO foo (bar) VALUES (?)", values: [2])
+    } catch {
+        rollback?.pointee = true
+    }
+}
+```
+
+Because FMDB 2.6 was not audited for nullability, Swift inferred that `db` and `rollback` were optionals. But, now, in FMDB 2.7, Swift now knows that, for example, neither `db` nor `rollback` above can be `nil`, so they are no longer optionals. Thus it becomes:
+
+```swift
+queue.inTransaction { db, rollback in
+    do {
+        try db.executeUpdate("INSERT INTO foo (bar) VALUES (?)", values: [1])
+        try db.executeUpdate("INSERT INTO foo (bar) VALUES (?)", values: [2])
+    } catch {
+        rollback.pointee = true
+    }
+}
+```
+
+### Custom Functions
+
+In the past, when writing custom functions, you would have to generally include your own `@autoreleasepool` block to avoid problems when writing functions that scanned through a large table. Now, FMDB will automatically wrap it in an autorelease pool, so you don't have to.
+
+Also, in the past, when retrieving the values passed to the function, you had to drop down to the SQLite C API and include your own `sqlite3_value_XXX` calls. There are now `FMDatabase` methods, `valueInt`, `valueString`, etc., so you can stay within Swift and/or Objective-C, without needing to call the C functions yourself. Likewise, when specifying the return values, you no longer need to call `sqlite3_result_XXX` C API, but rather you can use `FMDatabase` methods, `resultInt`, `resultString`, etc. There is a new `enum` for `valueType` called `SqliteValueType`, which can be used for checking the type of parameter passed to the custom function.
+
+Thus, you can do something like (as of Swift 3):
+
+```swift
+db.makeFunctionNamed("RemoveDiacritics", arguments: 1) { context, argc, argv in
+    guard db.valueType(argv[0]) == .text || db.valueType(argv[0]) == .null else {
+        db.resultError("Expected string parameter", context: context)
+        return
+    }
+
+    if let string = db.valueString(argv[0])?.folding(options: .diacriticInsensitive, locale: nil) {
+        db.resultString(string, context: context)
+    } else {
+        db.resultNull(context: context)
+    }
+}
+```
+
+And you can then use that function in your SQL (in this case, matching both "Jose" and "José"):
+
+```sql
+SELECT * FROM employees WHERE RemoveDiacritics(first_name) LIKE 'jose'
+```
+
+Note, the method `makeFunctionNamed:maximumArguments:withBlock:` has been renamed to `makeFunctionNamed:arguments:block:`, to more accurately reflect the functional intent of the second parameter.
+
+### API Changes
+
+In addition to the `makeFunctionNamed` noted above, there are a few other API changes. Specifically, 
+
+ - To become consistent with the rest of the API, the methods `objectForColumnName` and `UTF8StringForColumnName` have been renamed to `objectForColumn` and `UTF8StringForColumn`.
+
+ - Note, the `objectForColumn` (and the associted subscript operator) now returns `nil` if an invalid column name/index is passed to it. It used to return `NSNull`.
+
+ - To avoid confusion with `FMDatabaseQueue` method `inTransaction`, which performs transactions, the `FMDatabase` method to determine whether you are in a transaction or not, `inTransaction`, has been replaced with a read-only property, `isInTransaction`. 
+
+ - Several functions have been converted to properties, namely, `databasePath`, `maxBusyRetryTimeInterval`, `shouldCacheStatements`, `sqliteHandle`, `hasOpenResultSets`, `lastInsertRowId`, `changes`, `goodConnection`, `columnCount`, `resultDictionary`, `applicationID`, `applicationIDString`, `userVersion`, `countOfCheckedInDatabases`, `countOfCheckedOutDatabases`, and `countOfOpenDatabases`. For Objective-C users, this has little material impact, but for Swift users, it results in a slightly more natural interface. Note: For Objective-C developers, previously versions of FMDB exposed many ivars (but we hope you weren't using them directly, anyway!), but the implmentation details for these are no longer exposed.
+
+### URL Methods
+
+In keeping with Apple's shift from paths to URLs, there are now `NSURL` renditions of the various `init` methods, previously only accepting paths. 
+
 
 ## Swift
 
