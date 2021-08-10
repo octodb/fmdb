@@ -1,9 +1,9 @@
-# FMDB v2.7
+# OctoFMDB
 <!--[![Platform](https://img.shields.io/cocoapods/p/FMDB.svg?style=flat)](http://cocoadocs.org/docsets/Alamofire)-->
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/FMDB.svg)](https://img.shields.io/cocoapods/v/FMDB.svg)
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
-This is an Objective-C wrapper around [SQLite](https://sqlite.org/).
+This is an Objective-C wrapper around [OctoDB](http://octodb.io) and [SQLite](https://sqlite.org/).
 
 ## The FMDB Mailing List:
 https://groups.google.com/group/fmdb
@@ -13,14 +13,11 @@ https://www.sqlite.org/faq.html
 
 Since FMDB is built on top of SQLite, you're going to want to read this page top to bottom at least once.  And while you're there, make sure to bookmark the SQLite Documentation page: https://www.sqlite.org/docs.html
 
-## Contributing
-Do you have an awesome idea that deserves to be in FMDB?  You might consider pinging ccgus first to make sure he hasn't already ruled it out for some reason.  Otherwise pull requests are great, and make sure you stick to the local coding conventions.  However, please be patient and if you haven't heard anything from ccgus for a week or more, you might want to send a note asking what's up.
-
 ## Installing
 
 ### CocoaPods
 
-FMDB can be installed using [CocoaPods](https://cocoapods.org/).
+OctoFMDB can be installed using [CocoaPods](https://cocoapods.org/).
 
 If you haven't done so already, you might want to initialize the project, to have it produce a `Podfile` template for you:
 
@@ -28,7 +25,7 @@ If you haven't done so already, you might want to initialize the project, to hav
 $ pod init
 ```
 
-Then, edit the `Podfile`, adding `FMDB`:
+Then, edit the `Podfile`, adding `OctoFMDB`:
 
 ```ruby
 # Uncomment the next line to define a global platform for your project
@@ -40,11 +37,7 @@ target 'MyApp' do
 
     # Pods for MyApp2
 
-    pod 'FMDB'
-    # pod 'FMDB/FTS'   # FMDB with FTS
-    # pod 'FMDB/standalone'   # FMDB with latest SQLite amalgamation source
-    # pod 'FMDB/standalone/FTS'   # FMDB with latest SQLite amalgamation source and FTS
-    # pod 'FMDB/SQLCipher'   # FMDB with SQLCipher
+    pod 'OctoFMDB'
 end
 ```
 
@@ -57,8 +50,6 @@ $ pod install
 Then open the `.xcworkspace` rather than the `.xcodeproj`.
 
 For more information on Cocoapods visit https://cocoapods.org.
-
-**If using FMDB with [SQLCipher](https://www.zetetic.net/sqlcipher/) you must use the FMDB/SQLCipher subspec. The FMDB/SQLCipher subspec declares SQLCipher as a dependency, allowing FMDB to be compiled with the `-DSQLITE_HAS_CODEC` flag.**
 
 ### Carthage
 
@@ -73,20 +64,20 @@ You can then configure your project as outlined in Carthage's [Getting Started](
 
 ### Swift Package Manager
 
-Declare FMDB as a package dependency.
+Declare OctoFMDB as a package dependency.
 ```swift
 .package(
-    name: "FMDB", 
-    url: "https://github.com/ccgus/fmdb", 
-    .upToNextMinor(from: "2.7.8")),
+    name: "OctoFMDB", 
+    url: "https://github.com/octodb/fmdb", 
+    .upToNextMinor(from: "1.0.0")),
 ```
 
-Use FMDB in target dependencies
+Use OctoFMDB in target dependencies
 ```swift
-.product(name: "FMDB", package: "FMDB")
+.product(name: "OctoFMDB", package: "OctoFMDB")
 ```
 
-## FMDB Class Reference:
+## OctoFMDB Class Reference:
 https://ccgus.github.io/fmdb/html/index.html
 
 ## Automatic Reference Counting (ARC) or Manual Memory Management?
