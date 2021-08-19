@@ -15,10 +15,18 @@ Pod::Spec.new do |s|
   # build with the OctoDB static libraries
   s.subspec 'octodb' do |ss|
     ss.source_files = 'src/fmdb/FM*.{h,m}'
+    ss.preserve_paths = 'src/octodb/**/*.{h,m,a}'
     ss.exclude_files = 'src/fmdb.m'
     ss.header_dir = 'fmdb'
     ss.libraries = 'octodb', 'binn', 'uv', 'secp256k1-vrf'
-    ss.xcconfig = { 'LIBRARY_SEARCH_PATHS' => "$(inherited) $(PROJECT_DIR)/octodb/lib/", 'HEADER_SEARCH_PATHS' => "$(inherited) $(SRCROOT)/octodb/include/" }
+    ss.vendored_libraries = 'src/octodb/lib/*.a'
+    # ss.vendored_libraries = 'src/octodb/lib/liboctodb.a', 'src/octodb/lib/libbinn.a', 'src/octodb/lib/libuv.a', 'src/octodb/lib/libsecp256k1-vrf.a'
+    ss.xcconfig = { 
+      'LIBRARY_SEARCH_PATHS' => "$(inherited) ${PODS_ROOT}/#{s.name}/octodb/octodb/lib/**", 
+      'HEADER_SEARCH_PATHS' => "$(inherited) ${PODS_ROOT}/#{s.name}/octodb/octodb/include/**" 
+    }
+    ss.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'}
+    ss.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'}
   end
 
 end
