@@ -69,7 +69,7 @@ Declare OctoFMDB as a package dependency.
 .package(
     name: "OctoFMDB", 
     url: "https://github.com/octodb/fmdb", 
-    .upToNextMinor(from: "1.0.0")),
+    .upToNextMinor(from: "1.1.0")),
 ```
 
 Use OctoFMDB in target dependencies

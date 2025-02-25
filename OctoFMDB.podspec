@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'OctoFMDB'
-  s.version = '1.0.0'
+  s.version = '1.1.0'
   s.summary = 'A Cocoa / Objective-C wrapper around OctoDB & SQLite'
   s.homepage = 'https://github.com/octodb/fmdb'
   s.license = 'MIT'
